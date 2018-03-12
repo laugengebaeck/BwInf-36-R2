@@ -1,0 +1,94 @@
+\documentclass[a4paper, notitlepage, 12pt]{scrartcl}
+\author{Lukas Rost \\ \small{Teilnahme-ID: 44137}}
+\title{Aufgabe 1 \\ \glqq Die Kunst der Fuge\grqq  - Dokumentation}
+\subtitle{36. Bundeswettbewerb Informatik 2017/18 - 2. Runde \\~\\}
+\date{9. April 2018}
+\usepackage[ngerman]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{color}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\usepackage[top=2.5cm, bottom=1.5cm, left=2.5cm, right=2.5cm]{geometry}
+\usepackage{fancyvrb}
+\usepackage{caption}
+\usepackage{mathtools}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{multicol}
+
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+\usepackage{minted}
+\fvset{breaklines=true}
+
+\pagestyle{fancy}
+\lhead{Lukas Rost, Teilnahme-ID: 44137}
+\rhead{Aufgabe 1, Seite \thepage ~von \pageref{LastPage}}
+\cfoot{ }
+
+\newenvironment{longlisting}{\captionsetup{type=listing}}{}
+
+\newmintedfile{java}{frame=single,linenos,samepage=false,firstnumber=1,rulecolor=\color{Gray},autogobble,breakafter=.u,fontsize=\small}
+
+\begin{document}
+\renewcommand{\contentsname}{\centerline{Inhaltsverzeichnis}}
+ \maketitle
+ \tableofcontents
+ \thispagestyle{empty}
+ \newpage
+ \setcounter{page}{1}
+ 
+ \section{Lösungsidee}
+ \subsection{Mögliche Maximalhöhe der Mauer}
+ Da in der Aufgabe explizit nach der Höhe der Mauer für verschiedene $n$ gefragt ist, lohnt es sich, diese zunächst einmal mathematisch zu berechnen. Damit lässt sich der Suchraum effektiv eingrenzen, da ab dieser Maximalhöhe die Forderungen der Aufgabenstellung nicht mehr erfüllt werden können. Pro Reihe der Mauer gibt es $n-1$ verschiedene Fugen. Diese Zahl ergibt sich daraus, dass hinter jedem Klötzchen genau eine Fuge folgt. Nur beim letzten Klötzchen der Reihe zählt diese Position nicht, da sich dahinter kein weiteres Klötzchen befindet. \\ \\
+Fugen sind also per definitionem nur die Stellen zwischen den Klötzchen, da die Position 0 sowie die Position $\frac{n \cdot (n+1) }{2}$ am Ende der Reihe in jeder Reihe belegt werden. Nun interessiert noch die Zahl der insgesamt belegbaren Fugenpositionen. Dies sind alle Positionen von 1 bis zur Länge der Mauer minus 1, da, wie bereits erwähnt, die Position am Ende nicht als Fuge zählt. Die Länge der Mauer ist die Summe aller natürlichen Zahlen bis $n$, also nach der Gaußschen Summenformel $\frac{n \cdot (n+1) }{2}$. \\ \\
+Teilt man nun die Anzahl der insgesamt verfügbaren Fugenpositionen durch die Anzahl der Fugen pro Reihe, erhält man die mögliche Anzahl an Reihen, also die Höhe. 
+\begin{equation}
+H(n) = \frac{\frac{n \cdot (n+1) }{2} - 1}{n - 1} = \frac{(n + 2) \cdot (n - 1)}{2 \cdot (n - 1)} = \floor{\frac{n + 2}{2}}
+\end{equation}
+Die Abrundungsfunktion ist an dieser Stelle nötig, da sonst für ungerade $n$ das Resultat keine natürliche Zahl ist. Halbe Reihen jedoch ergeben wenig Sinn. Die angegebene Funktion $H(n)$ ist für alle natürlichen Zahlen $ n \geq 2$ definiert. \\ \\
+Der Fall $ n = 1$ ist damit nicht berechenbar, da in der Originalgleichung durch 0 geteilt würde. Dieser muss auch ausgeschlossen werden, da es dabei keine Fugen im Sinne von Stellen zwischen den Klötzen gibt. Somit ist nicht eindeutig definiert, ob in diesem Fall nur eine Reihe (mit einem Klotz der Länge 1) oder unendlich viele Reihen erlaubt sind.
+\subsection{Lösungsansatz: Backtracking}
+\subsection{Laufzeit und NP-Äquivalenz}
+ \section{Umsetzung}
+ \section{Beispiele}
+ \begin{multicols}{2}
+ \begin{verbatim}
+ Lösung für n = 2: 
+ | 1 | 2 | 
+ | 2 | 1 |
+ 
+ Lösung für n = 3:
+ | 1 | 2 | 3 | 
+ | 2 | 3 | 1 |
+ 
+ Lösung für n = 4: 
+ | 1 | 2 | 3 | 4 | 
+ | 2 | 3 | 4 | 1 | 
+ | 4 | 3 | 1 | 2 |
+ 
+ 
+ Lösung für n = 5: 
+ | 1 | 2 | 3 | 4 | 5 | 
+ | 2 | 3 | 4 | 5 | 1 | 
+ | 4 | 3 | 5 | 1 | 2 |
+ 
+ 
+ Lösung für n = 6: 
+ | 1 | 2 | 3 | 4 | 5 | 6 | 
+ | 5 | 6 | 3 | 2 | 4 | 1 | 
+ | 4 | 3 | 6 | 5 | 1 | 2 | 
+ | 2 | 6 | 1 | 3 | 5 | 4 |    
+ \end{verbatim}
+ \end{multicols}
+ \section{Quellcode}
+ \renewcommand{\listingscaption}{Quellcode}
+ 
+ \begin{longlisting}
+ \javafile[firstline=28,lastline=107]{../Bwinf-Aufgabe1-KunstDerFuge/src/de/lukasrost/bwinf2017/Main.java}
+ \caption{Der Backtracking-Algorithmus}
+ \end{longlisting}
+ 
+ \end{document}
