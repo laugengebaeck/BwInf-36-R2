@@ -29,7 +29,7 @@ public class Main {
         }
         System.out.println();
         System.out.println("Benötigte Zeit: " + (afterTime-beforeTime) + " Millisekunden");
-        System.out.println("Rekursionsaufrufe: "+recursionCount);
+        System.out.println("Rekursionsaufrufe: "+ recursionCount);
     }
 
     private static int[][] getSolution(int n){
