@@ -3,13 +3,18 @@ package de.lukasrost.bwinf2017.r2_1;
 import java.util.*;
 
 public class Main {
-    final static int NPOSSIBLE = -1;
-    final static int NPOSSIBLEPARENT = -2;
+    private final static int IMPOSSIBLE = -1;
+    private final static int IMPOSSIBLEPARENT = -2;
+    private static int recursionCount = 0;
 
     public static void main(String[] args) {
         System.out.print("Bitte n der Mauer eingeben: ");
         Scanner scanner = new Scanner(System.in);
         int n = scanner.nextInt();
+        if (n < 2){
+            System.out.println("n ist zu klein. Keine Lösung möglich!");
+            System.exit(0);
+        }
         System.out.println("Starte Backtracking...");
         long beforeTime = System.currentTimeMillis();
         int[][] arr = getSolution(n);
@@ -24,6 +29,7 @@ public class Main {
         }
         System.out.println();
         System.out.println("Benötigte Zeit: " + (afterTime-beforeTime) + " Millisekunden");
+        System.out.println("Rekursionsaufrufe: "+recursionCount);
     }
 
     private static int[][] getSolution(int n){
@@ -57,6 +63,7 @@ public class Main {
     }
 
     private static int[][] backTrack(int n, int[][] mauerBefore, int reihe, int klotzInReihe, boolean[] usableKloetze, boolean[] usedFugen){
+        recursionCount++;
         if (reihe > ((n+2)/2)-1){
             return mauerBefore;
         }
@@ -71,8 +78,8 @@ public class Main {
                 usableKloetze[klotz] = false;
             }
         }
-        if (reihe != (((n+2)/2)-1) && checkPruning(usedFugen, n)){
-            return new int[][]{{NPOSSIBLEPARENT}};
+        if (reihe != (((n+2)/2)-1) && checkPruning(usedFugen, n, usableKloetzeNextEbene, summe)){
+            return new int[][]{{IMPOSSIBLEPARENT}};
         }
         label:
         for (int uk = usableKloetze.length - 1; uk >= 1; uk--) {
@@ -98,12 +105,12 @@ public class Main {
             }
             int[][] mauerDanach = backTrack(n, mauerBefore, reiheneu, klotzInReiheNeu, usableKloetzeNextEbene2, usedFugen);
             switch (mauerDanach[0][0]) {
-                case NPOSSIBLE:
+                case IMPOSSIBLE:
                     usedFugen[summe + uk] = false;
                     usableKloetzeNextEbene[uk] = true;
                     mauerBefore[reihe][klotzInReihe] = 0;
                     break;
-                case NPOSSIBLEPARENT:
+                case IMPOSSIBLEPARENT:
                     usedFugen[summe + uk] = false;
                     usableKloetzeNextEbene[uk] = true;
                     mauerBefore[reihe][klotzInReihe] = 0;
@@ -112,21 +119,36 @@ public class Main {
                     return mauerDanach;
             }
         }
-        return new int[][]{{NPOSSIBLE}};
+        return new int[][]{{IMPOSSIBLE}};
     }
 
-    private static boolean checkPruning(boolean[] usedFugen, int n){
-        int k = (n *(n+1) /2);
+    private static boolean checkPruning(boolean[] usedFugen, int n, boolean[] kloetze, int summe){
+        int k = n *(n+1) /2;
         ArrayList<Integer> nichtBelegt = new ArrayList<>();
         for (int i = 0; i <= k; i++) {
             if (usedFugen[i]) continue;
             nichtBelegt.add(i);
+        }
+        int min = n;
+        for (int i = n; i >= 1; i--) {
+            if (kloetze[i]) {
+                min = i;
+                break;
+            }
         }
         boolean ret = false;
         for (int i=0; i < nichtBelegt.size(); i++) {
             if(i == nichtBelegt.size() -1) continue;
             if (nichtBelegt.get(i+1) - nichtBelegt.get(i) > n){
                 ret = true;
+                break;
+            }
+        }
+        for (int i=0; i < nichtBelegt.size(); i++) {
+            if((i == nichtBelegt.size() -1)||(nichtBelegt.get(i) < summe)) continue;
+            if (nichtBelegt.get(i+1) - nichtBelegt.get(i) > min){
+                ret = true;
+                break;
             }
         }
         return ret;
