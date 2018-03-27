@@ -19,6 +19,8 @@
 \usepackage{multicol}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.15}
+\usepackage{tikz}
+\usetikzlibrary{trees}
 
 \DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
 
@@ -79,9 +81,26 @@ Es wird also ein effizienterer Lösungsalgorithmus für das Problem benötigt. D
 Backtracking stellt dabei eine Tiefensuche auf einem impliziten Baum dar. Zunächst wird für Backtracking ein Lösungsvektor benötigt. In diesem Fall kann das ein zweidimensionales Array sein, dessen erste Dimension die Reihe darstellt und dessen zweite Dimension für jede Reihe von links nach rechts die verwendeten Klötze angibt. Die Knoten des genannten Baumes stellen dabei die Zustände des Lösungsvektors dar und es existiert eine Kante zwischen Zuständen, die durch Hinzufügen eines Klotzes an das Ende des aktuellen Lösungsvektors auseinander hervorgehen. Die Wurzel des Baumes, an der die Backtracking-Suche begonnen wird, stellt ein leerer Lösungsvektor dar.
 \\ \\
 Beim Backtracking wird nun also Klotz für Klotz eine Lösung aufgebaut. Dabei wird jeweils der längste in dieser Reihe noch nicht verwendete und an dieser Stelle noch nicht ausprobierte Klotz gewählt. Sobald jedoch sicher ist, dass eine solche Teillösung nicht zu einer Gesamtlösung ausgebaut werden kann, kommt das sogenannte Pruning zum Einsatz. Da es sinnlos ist, von einer solchen Teillösung aus weiter in die Tiefe zu gehen, kann man die Wahl des Klotzes auf der aktuellen Stufe rückgängig machen und in die vorherige Stufe zurückwechseln. Dort werden dann alle weiteren aktuellen Wahlmöglichkeiten des Klotzes nach dem gleichen Prinzip durchprobiert.
-\\ \\
+\begin{figure}[H]
+\centering \begin{tikzpicture}[level distance=1.5cm,
+  level 1/.style={sibling distance=3cm},
+  level 2/.style={sibling distance=1.5cm}]
+  \node {1}
+    child {node {1,2}
+      child {node {1,2,3}
+      	child {node {...}}
+      	}
+    }
+    child {node {1,3}
+    	child {node {1,3,2}
+      		child {node {...}}
+      		}
+    };
+\end{tikzpicture}
+\caption{Ausschnitt des Rekursionsbaums für $n = 3$ ohne festgelegte erste Reihe}
+\end{figure}
 Ein solcher Algorithmus findet in jedem Fall eine maximal hohe Mauer, sofern es eine solche gibt. Es handelt sich hierbei nämlich nur um eine intelligentere Variante der Brute-Force-Suche. Wichtig für die Funktionsfähigkeit dieses Algorithmus ist, dass die Höhe der Mauer durch einen Maximalwert begrenzt ist und wir somit wissen, wann eine vollständige Lösung erreicht ist. Sobald eine solche erreicht ist, kann die Suche auch abgebrochen werden, da nur eine Mauer mit maximaler Höhe gesucht ist.
-\\ \\
+\\
 Nun ist es noch wichtig, Pruning-Kriterien so zu definieren, dass möglichst viele nicht ausbaubaren Teillösungen möglichst früh gefunden und solche Teillösungen verworfen werden. Bei geeigneten Kriterien lässt sich nämlich die Laufzeit im Vergleich zu Brute Force erheblich verbessern.
 \\ \\
 \textbf{Pruning-Kriterien}
@@ -111,7 +130,7 @@ Dieser Abschnitt soll weitere denkbare Lösungsansätze nennen und zeigen, warum
 \item \textit{Der Greedy-Ansatz:} Dieser bestünde daraus, für jeden angelegten Klotz einfach den größten möglichen Klotz zu nehmen, der keine Fugenposition doppelt belegt. Alle vollständigen Reihen, die dabei entstehen, würden dann die Mauer bilden. Es sollte klar sein, dass dieser Ansatz keinesfalls immer eine maximal hohe Mauer liefern kann.
 \item \textit{Heuristiken:} Probleme, die sich sonst nur durch Backtracking lösen lassen, versucht man oft mittels Heuristiken wie z.B. Simulated Annealing schneller zu lösen. Dies ist hier jedoch nur schwierig möglich, denn dafür benötigt man einen Lösungsraum, der hier aus allen möglichen Mauern der Maximalhöhe (unabhängig davon, ob diese die Anforderungen erfüllen) bestehen könnte. Dann benötigte man eine Bewertungsfunktion, die hier der Anzahl der doppelt belegten Fugenpositionen entsprechen könnte. Diese wäre dann zu minimieren. Dann wäre hier noch eine Idee nötig, wie man aus einer möglichen Lösung eine andere gewinnen könnte. Man könnte dazu beispielsweise zwei beliebige Klötze in einer beliebigen Reihe miteinander vertauschen. \\ \\
 Aus welchen Gründen jedoch ist dieser Ansatz nicht geeignet? Zunächst kann man nicht verhindern, dass mögliche Lösungen doppelt betrachtet werden, wenn man keinen enormen Speicherverbrauch in Kauf nehmen möchte. Außerdem kann man sich nicht sicher sein, dass die bisher beste Lösung (nach $i$ Iterationen des Simulated Annealing) tatsächlich eine gültige Lösung (mit 0 doppelten Fugen) ist. Zuletzt betrachtet man schlimmstenfalls genau so viele Lösungsmöglichkeiten (oder gar mehr) wie bei Brute Force.
-\item \textit{Weitere Pruning-Kriterien:} Grundsätzlich könnten weitere Pruning-Kriterien die Laufzeit im besten Fall dramatisch verbessern. Alle weiteren Pruning-Kriterien, die ich gefunden habe, brachten jedoch keine Verbesserung oder sogar eine Verschlechterung. Als Beispiel sei hier ein Kriterium genannt. Es ist offensichtlich, dass sich in einer richtigen Lösung alle Reihen untereinander vertauschen lassen und die Lösung trotzdem richtig bleibt. \\ \\ Umgekehrt gilt auch: Wenn eine Reihe\footnote{Im Sinne einer Folge von Klötzen, welche entsprechend unabhängig von der genauen Positionierung in der Mauer ist, und nicht als mit Klötzen zu belegende Reihe.} oder ein Teil einer Reihe beim Backtracking nicht zu einer Lösung führen, dann können diese an anderen Stellen in der Mauer ebenfalls nicht zu einer Lösung führen. Dies gilt zumindest solange, bis eine der Fugen, die die weitere Fortsetzung der Reihe blockiert hat, da sie belegt war, wieder freigegeben wird. Diese nicht zu einer Lösung führenden (Teil-)Reihen könnten man als Pruning-Kriterium festlegen. Implementiert man dieses Kriterium jedoch, so verschlechtert es sowohl Laufzeit als auch Speicherverbrauch.
+\item \textit{Weitere Pruning-Kriterien:} Grundsätzlich könnten weitere Pruning-Kriterien die Laufzeit im besten Fall dramatisch verbessern. Alle weiteren Pruning-Kriterien, die ich gefunden habe, brachten jedoch keine Verbesserung oder sogar eine Verschlechterung. Als Beispiel sei hier ein Kriterium genannt. Es ist offensichtlich, dass sich in einer richtigen Lösung alle Reihen untereinander vertauschen lassen und die Lösung trotzdem richtig bleibt. \\ \\ Umgekehrt gilt auch: Wenn eine Reihe\footnote{Im Sinne einer Folge von Klötzen, welche entsprechend unabhängig von der genauen Positionierung in der Mauer ist.} oder ein Teil einer Reihe beim Backtracking nicht zu einer Lösung führen, dann können diese an anderen Stellen in der Mauer ebenfalls nicht zu einer Lösung führen. Dies gilt zumindest solange, bis eine der Fugen, die die weitere Fortsetzung der Reihe blockiert hat (da sie belegt war), wieder freigegeben wird. Diese nicht zu einer Lösung führenden (Teil-)Reihen könnte man als Pruning-Kriterium festlegen. Implementiert man dieses Kriterium jedoch, so verschlechtert es sowohl Laufzeit als auch Speicherverbrauch.
 \end{itemize}
 Möglicherweise reicht es Ilona jedoch, wenn ihre Mauer für größere $n$ nicht maximal hoch ist, sie dafür aber wenigstens eine weniger hohe Mauer geliefert bekommt. Dazu kann man das Backtracking ganz einfach vorzeitig, also bei Erreichen einer geringeren Höhe, abbrechen. \\ \\ In der nachfolgenden Implementierung ist dies so geregelt, dass eine wählbare Anzahl von Reihen (diese muss bei jedem $n$ experimentell bestimmt werden) von der Maximalhöhe abgezogen wird. Sobald diese reduzierte Höhe erreicht ist, wird die Lösung ausgegeben. Insofern versuche ich mit diesem Schritt, eine möglichst hohe Mauer zu approximieren und gleichzeitig die Laufzeit erträglich zu halten.
 \begin{thebibliography}{xx}
@@ -151,7 +170,7 @@ Nun gibt es drei Möglichkeiten für das Ergebnis dieses Aufrufs:
 \end{enumerate}
 Hat die ganze Schleife keinen passenden Klotz gefunden, wird (\texttt{IMPOSSIBLE}) zurückgegeben, d.h. dass es auf der aktuellen Ebene überhaupt keine passende Klotz-Wahl gibt.
 \\ \\
-Zuletzt ist \texttt{checkPruning()} dafür verantwortlich, die erweiterten Pruning-Kriterien zu überwachen.
+Zuletzt ist \texttt{checkPruning()} dafür verantwortlich, die erweiterten Pruning-Kriterien zu überwachen. Dazu werden zunächst alle nicht belegten Fugen in einer Liste gespeichert. Außerdem wird der größte aktuell noch verfügbare Klotz für den zweiten Teil des Kriteriums bestimmt. Anschließend wird der erste Teil des Kriteriums überprüft, indem der Abstand von nebeneinanderliegenden nicht belegten Fugen ermittelt wird. Daraufhin wird in ähnlicher Weise der zweite Teil des Kriteriums überprüft, wobei dies natürlich erst ab der aktuellen Klotzsumme in der aktuellen Reihe geschieht.
 \newpage
 \section{Beispiele}
  \begin{multicols}{2}
