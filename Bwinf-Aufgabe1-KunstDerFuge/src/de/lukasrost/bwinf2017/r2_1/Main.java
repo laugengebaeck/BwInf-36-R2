@@ -15,9 +15,11 @@ public class Main {
             System.out.println("n ist zu klein. Keine Lösung möglich!");
             System.exit(0);
         }
+        System.out.print("Um wie viele Reihen soll die Höhe reduziert werden? (0=Maximalhöhe):");
+        int reihen = scanner.nextInt();
         System.out.println("Starte Backtracking...");
         long beforeTime = System.currentTimeMillis();
-        int[][] arr = getSolution(n);
+        int[][] arr = getSolution(n, reihen);
         long afterTime = System.currentTimeMillis();
         System.out.println("Lösung: ");
         for (int[] anArr : arr){
@@ -32,8 +34,9 @@ public class Main {
         System.out.println("Rekursionsaufrufe: "+ recursionCount);
     }
 
-    private static int[][] getSolution(int n){
-        int[][] solution = new int[(n+2)/2][n];
+    private static int[][] getSolution(int n, int reihen){
+        int height = ((n+2)/2) - reihen;
+        int[][] solution = new int[height][n];
         for (int z = 1; z <= n; z++){
             solution[0][z-1] = z;
             if (n != 6 && n != 10) {
@@ -58,15 +61,13 @@ public class Main {
         boolean[] usableKloetzeNextEbene = new boolean[n+1];
         Arrays.fill(usableKloetzeNextEbene, true);
         int t = (n == 6 || n== 10) ? 1 : 2;
-        solution = backTrack(n, solution,t,0,usableKloetzeNextEbene,usedFugen);
+        solution = backTrack(n, solution,t,0,usableKloetzeNextEbene,usedFugen, height);
         return solution;
     }
 
-    private static int[][] backTrack(int n, int[][] mauerBefore, int reihe, int klotzInReihe, boolean[] usableKloetze, boolean[] usedFugen){
+    private static int[][] backTrack(int n, int[][] mauerBefore, int reihe, int klotzInReihe, boolean[] usableKloetze, boolean[] usedFugen, int height){
         recursionCount++;
-        if (reihe > ((n+2)/2)-1){
-            return mauerBefore;
-        }
+        if (reihe > (height-1)) return mauerBefore;
         int summe = 0;
         for (int i = 0; i < klotzInReihe; i++){
             summe += mauerBefore[reihe][i];
@@ -78,7 +79,7 @@ public class Main {
                 usableKloetze[klotz] = false;
             }
         }
-        if (reihe != (((n+2)/2)-1) && checkPruning(usedFugen, n, usableKloetzeNextEbene, summe)){
+        if (reihe != (height-1) && checkPruning(usedFugen, n, usableKloetzeNextEbene, summe)){
             return new int[][]{{IMPOSSIBLEPARENT}};
         }
         label:
@@ -90,7 +91,7 @@ public class Main {
             if (summe + uk != ((n) * (n + 1)) / 2) {
                 usedFugen[summe + uk] = true;
             }
-            if (reihe == (((n + 2) / 2) - 1) && klotzInReihe == n - 1) {
+            if (reihe == (height - 1) && klotzInReihe == n - 1) {
                 return mauerBefore;
             }
             int reiheneu = reihe;
@@ -103,7 +104,7 @@ public class Main {
             } else {
                 usableKloetzeNextEbene2 = Arrays.copyOf(usableKloetzeNextEbene, usableKloetzeNextEbene.length);
             }
-            int[][] mauerDanach = backTrack(n, mauerBefore, reiheneu, klotzInReiheNeu, usableKloetzeNextEbene2, usedFugen);
+            int[][] mauerDanach = backTrack(n, mauerBefore, reiheneu, klotzInReiheNeu, usableKloetzeNextEbene2, usedFugen, height);
             switch (mauerDanach[0][0]) {
                 case IMPOSSIBLE:
                     usedFugen[summe + uk] = false;
