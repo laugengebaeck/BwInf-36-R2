@@ -149,8 +149,8 @@ Als Eingabe erwartet das Programm $n$ und gegebenenfalls die Anzahl an Reihen, u
 Das Programm besteht aus vier Funktionen in der Klasse \texttt{de.lukasrost.bwinf2017.r2\_1.Main}. Gestartet wird das Programm über die Funktion \texttt{main()}. Diese fragt die Eingabeparameter ab und gibt schließlich die Mauer aus. Zusätzlich werden unzulässige $n$ ($< 2$) abgewiesen und die Zeit für die Ausführung des Algorithmus gestoppt. \\ \\
 Die Funktion \texttt{getSolution()} bereitet das Backtracking vor. Dazu werden die ersten beiden Reihen (bzw. bei $n = 6$ oder $n = 10$ die erste Reihe) im zweidimensionalen Mauer-Array\footnote{Erste Dimension ist die Reihe, zweite Dimension der Klotz in der Reihe.} vorbelegt. Weiterhin werden die anderen von der Backtracking-Funktion genutzten Datenstrukturen initialisiert. Dies sind: 
 \begin{itemize}
-\item Der boolesche Bitvektor \texttt{usedFugen} speichert, welche Fugenpositionen schon belegt sind. \texttt{usedFugen[$i$]} gibt an, ob die Fuge $i$ bereits belegt ist. Zu Beginn ist keine Fuge genutzt, anschließend werden die bereits genutzten Fugen der ersten beiden Reihen gespeichert. Die Nummerierung der Fugen folgt dabei der unten zu sehenden Abbildung.
-\item Der ebenfalls boolesche Bitvektor \texttt{usableKloetze} gibt an, welche der Klötze von 1 bis $n$ an der aktuellen Position nutzbar sind. Am Anfang einer Reihe sind jeweils alle Klötze nutzbar, beim zweiten Klotz einer Reihe dann alle Klötze außer der als erster Klotz ausgewählte Klotz, usw.
+\item Der Bitvektor \texttt{usedFugen} speichert, welche Fugenpositionen schon belegt sind. \texttt{usedFugen[$i$]} gibt an, ob die Fuge $i$ bereits belegt ist. Zu Beginn ist keine Fuge genutzt, anschließend werden die bereits genutzten Fugen der ersten beiden Reihen gespeichert. Die Nummerierung der Fugen folgt dabei der unten zu sehenden Abbildung.
+\item Der Bitvektor \texttt{usableKloetze} gibt an, welche der Klötze von 1 bis $n$ an der aktuellen Position nutzbar sind. Am Anfang einer Reihe sind jeweils alle Klötze nutzbar, beim zweiten Klotz einer Reihe dann alle Klötze außer der als erster Klotz ausgewählte Klotz, usw.
 \end{itemize}
 Die Array-Position $0$ hat dabei jeweils keine Bedeutung und bleibt ungenutzt. In beiden Fällen wurden Bitvektoren verwendet, da diese sehr laufzeit- und speichereffizient sind, was bei der Lösung von NP-Problemen enorm hilfreich sein kann und die Laufzeit verkürzt. \\
 \begin{figure}[H]
@@ -201,6 +201,10 @@ Zuletzt ist \texttt{checkPruning()} dafür verantwortlich, die erweiterten Pruni
  | 5 | 6 | 3 | 2 | 4 | 1 | 
  | 4 | 3 | 6 | 5 | 1 | 2 | 
  | 2 | 6 | 1 | 3 | 5 | 4 |
+ 
+ 
+ 
+ 
  
  Lösung für n = 7:
  | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 
@@ -323,9 +327,7 @@ Zuletzt ist \texttt{checkPruning()} dafür verantwortlich, die erweiterten Pruni
  | 18 | 20 | 15 | 19 | 16 | 14 | 13 | 12 | 11 | 10 | 9 | 7 | 17 | 6 | 5 | 4 | 3 | 2 | 1 | 8 | 
  | 17 | 20 | 19 | 15 | 16 | 14 | 13 | 12 | 11 | 10 | 9 | 7 | 6 | 8 | 3 | 18 | 5 | 2 | 1 | 4 | 
  | 16 | 18 | 17 | 19 | 15 | 14 | 12 | 20 | 11 | 9 | 10 | 7 | 8 | 3 | 6 | 1 | 5 | 2 | 4 | 13 | 
- | 13 | 20 | 19 | 17 | 15 | 14 | 12 | 18 | 11 | 7 | 8 | 6 | 2 | 4 | 9 | 3 | 5 | 1 | 10 | 16 | 
-
-  
+ | 13 | 20 | 19 | 17 | 15 | 14 | 12 | 18 | 11 | 7 | 8 | 6 | 2 | 4 | 9 | 3 | 5 | 1 | 10 | 16 |   
  \end{Verbatim}
  \end{center}
  Bei denjenigen Werten für $n$, bei denen  aus Laufzeitgründen eine Höhenreduzierung notwendig war, ist in der folgenden Tabelle jeweils der erste Höhenreduzierungswert angegeben, bei dem die Laufzeit unter 5 Minuten lag.
@@ -354,7 +356,7 @@ Zuletzt ist \texttt{checkPruning()} dafür verantwortlich, die erweiterten Pruni
 20 & 772 ms & 3237947 & 4 & 7& 11\\ \hline
  \end{tabular}
  \end{center}
- Für größere $n$ wurde das Programm nicht ausprobiert, da bei diesen die Laufzeiten noch problematischer werden als ohnehin schon. Es lässt sich feststellen, dass bei einer Höhe von 7 bis 8 Reihen eine \glqq magische Grenze\grqq ~zu liegen scheint, ab der die Laufzeiten unabhängig von $n$ inakzeptabel werden. Es ist denkbar, dass möglicherweise keine höheren Mauern, die die Bedingungen erfüllen, existieren, was ich jedoch nicht verifizieren kann.
+ Für größere $n$ wurde das Programm nicht ausprobiert, da bei diesen die Laufzeiten noch problematischer werden als ohnehin schon. Es lässt sich feststellen, dass bei einer Höhe von 7 bis 8 Reihen eine \glqq magische Grenze\grqq ~zu liegen scheint, ab der die Laufzeiten unabhängig von $n$ inakzeptabel werden. Es ist denkbar, dass möglicherweise keine höheren Mauern, die die Bedingungen erfüllen, existieren (unabhängig von $n$), was ich jedoch nicht verifizieren kann.
  \section{Quellcode}
  \renewcommand{\listingscaption}{Quellcode}
  
