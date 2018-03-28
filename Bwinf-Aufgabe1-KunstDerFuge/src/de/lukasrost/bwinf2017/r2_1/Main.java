@@ -3,9 +3,9 @@ package de.lukasrost.bwinf2017.r2_1;
 import java.util.*;
 
 public class Main {
-    private final static int IMPOSSIBLE = -1;
+    private final static int IMPOSSIBLE = -1; //Rückgabekonstanten
     private final static int IMPOSSIBLEPARENT = -2;
-    private static int recursionCount = 0;
+    private static int recursionCount = 0; //Rekursionsaufrufe
 
     public static void main(String[] args) {
         System.out.print("Bitte n der Mauer eingeben: ");
@@ -36,7 +36,7 @@ public class Main {
 
     private static int[][] getSolution(int n, int reihen){
         int height = ((n+2)/2) - reihen;
-        int[][] solution = new int[height][n];
+        int[][] solution = new int[height][n]; //Lösungsvektor initialisieren
         for (int z = 1; z <= n; z++){
             solution[0][z-1] = z;
             if (n != 6 && n != 10) {
@@ -44,7 +44,7 @@ public class Main {
             }
         }
         solution[1][n-1] = 1;
-        boolean[] usedFugen = new boolean[(n*(n+1)/2)+1];
+        boolean[] usedFugen = new boolean[(n*(n+1)/2)+1]; //Fugenliste initialisieren
         Arrays.fill(usedFugen,false);
         int fuge = 0;
         for (int z = 1; z < n; z++){
@@ -58,9 +58,9 @@ public class Main {
                 usedFugen[fuge2] = true;
             }
         }
-        boolean[] usableKloetzeNextEbene = new boolean[n+1];
+        boolean[] usableKloetzeNextEbene = new boolean[n+1]; //nutzbare Kloetze
         Arrays.fill(usableKloetzeNextEbene, true);
-        int t = (n == 6 || n== 10) ? 1 : 2;
+        int t = (n == 6 || n== 10) ? 1 : 2; //Startreihe festlegen
         solution = backTrack(n, solution,t,0,usableKloetzeNextEbene,usedFugen, height);
         return solution;
     }
@@ -68,33 +68,33 @@ public class Main {
     private static int[][] backTrack(int n, int[][] mauerBefore, int reihe, int klotzInReihe, boolean[] usableKloetze, boolean[] usedFugen, int height){
         recursionCount++;
         if (reihe > (height-1)) return mauerBefore;
-        int summe = 0;
+        int summe = 0; //vorherige Summe berechnen
         for (int i = 0; i < klotzInReihe; i++){
             summe += mauerBefore[reihe][i];
         }
-        boolean[] usableKloetzeNextEbene = Arrays.copyOf(usableKloetze,usableKloetze.length);
+        boolean[] usableKloetzeNextEbene = Arrays.copyOf(usableKloetze,usableKloetze.length); //Kloetze fuer Rekursion
         for (int klotz=1; klotz<usableKloetze.length; klotz++) {
             if (!usableKloetze[klotz]) continue;
             if (usedFugen[summe + klotz] && ((summe + klotz) != ((n * (n + 1)) / 2))) {
-                usableKloetze[klotz] = false;
+                usableKloetze[klotz] = false; //Klotz an dieser Position nicht nutzbar
             }
         }
         if (reihe != (height-1) && checkPruning(usedFugen, n, usableKloetzeNextEbene, summe)){
-            return new int[][]{{IMPOSSIBLEPARENT}};
+            return new int[][]{{IMPOSSIBLEPARENT}}; //erweitertes Pruning checken
         }
         label:
         for (int uk = usableKloetze.length - 1; uk >= 1; uk--) {
             if (!usableKloetze[uk]) continue;
-            mauerBefore[reihe][klotzInReihe] = uk;
+            mauerBefore[reihe][klotzInReihe] = uk; //Datenstrukturen updaten
             usableKloetzeNextEbene[uk] = false;
             usableKloetze[uk] = false;
             if (summe + uk != ((n) * (n + 1)) / 2) {
                 usedFugen[summe + uk] = true;
             }
             if (reihe == (height - 1) && klotzInReihe == n - 1) {
-                return mauerBefore;
+                return mauerBefore; //Mauer vollstaendig
             }
-            int reiheneu = reihe;
+            int reiheneu = reihe; //Rekursionsaufruf vorbereiten
             int klotzInReiheNeu = klotzInReihe + 1;
             boolean[] usableKloetzeNextEbene2 = new boolean[n + 1];
             if (klotzInReihe == n - 1) {
@@ -105,7 +105,7 @@ public class Main {
                 usableKloetzeNextEbene2 = Arrays.copyOf(usableKloetzeNextEbene, usableKloetzeNextEbene.length);
             }
             int[][] mauerDanach = backTrack(n, mauerBefore, reiheneu, klotzInReiheNeu, usableKloetzeNextEbene2, usedFugen, height);
-            switch (mauerDanach[0][0]) {
+            switch (mauerDanach[0][0]) { //Ergebnis auswerten
                 case IMPOSSIBLE:
                     usedFugen[summe + uk] = false;
                     usableKloetzeNextEbene[uk] = true;
@@ -120,7 +120,7 @@ public class Main {
                     return mauerDanach;
             }
         }
-        return new int[][]{{IMPOSSIBLE}};
+        return new int[][]{{IMPOSSIBLE}}; //auf dieser Ebene keine Loesung
     }
 
     private static boolean checkPruning(boolean[] usedFugen, int n, boolean[] kloetze, int summe){
@@ -128,30 +128,27 @@ public class Main {
         ArrayList<Integer> nichtBelegt = new ArrayList<>();
         for (int i = 0; i <= k; i++) {
             if (usedFugen[i]) continue;
-            nichtBelegt.add(i);
+            nichtBelegt.add(i); // noch nicht belegte Fugen
         }
-        int min = n;
+        int max = n; //groesster in der Reihe noch nicht verwendeter Klotz
         for (int i = n; i >= 1; i--) {
             if (kloetze[i]) {
-                min = i;
+                max = i;
                 break;
             }
         }
-        boolean ret = false;
         for (int i=0; i < nichtBelegt.size(); i++) {
             if(i == nichtBelegt.size() -1) continue;
             if (nichtBelegt.get(i+1) - nichtBelegt.get(i) > n){
-                ret = true;
-                break;
+                return true; //Kriterium Teil 1 erfuellt
             }
         }
         for (int i=0; i < nichtBelegt.size(); i++) {
             if((i == nichtBelegt.size() -1)||(nichtBelegt.get(i) < summe)) continue;
-            if (nichtBelegt.get(i+1) - nichtBelegt.get(i) > min){
-                ret = true;
-                break;
+            if (nichtBelegt.get(i+1) - nichtBelegt.get(i) > max){
+                return true; //Kriterium Teil 2 erfuellt
             }
         }
-        return ret;
+        return false;
     }
 }
