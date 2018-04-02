@@ -1,5 +1,8 @@
 package de.lukasrost.bwinf2017.r2_1;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class Main {
@@ -32,6 +35,7 @@ public class Main {
         System.out.println();
         System.out.println("Benötigte Zeit: " + (afterTime-beforeTime) + " Millisekunden");
         System.out.println("Rekursionsaufrufe: "+ recursionCount);
+        compileTikzPicture(arr,n);
     }
 
     private static int[][] getSolution(int n, int reihen){
@@ -150,5 +154,33 @@ public class Main {
             }
         }
         return false;
+    }
+
+    private static void compileTikzPicture(int[][] mauer, int n){
+        System.out.println("Schreibe und kompiliere jetzt TikZ-Bild der Mauer...");
+        StringBuilder latexContent = new StringBuilder();
+        latexContent.append("\\documentclass{standalone}\n");
+        latexContent.append("\\usepackage{tikz}\n \\begin{document}\n \\begin{tikzpicture} \n");
+        latexContent.append("\\draw[very thick] ");
+        int x = 0;
+        for (int i = 0; i < mauer.length ; i++) {
+            x = 0;
+            for (int j : mauer[i]) {
+                latexContent.append(String.format("(%d, %d) rectangle (%d, %d) ",x,i,x+j,i+1));
+                x += j;
+            }
+        }
+        latexContent.append("; \n \\end{tikzpicture}\n \\end{document}");
+        String text = latexContent.toString();
+
+        Path path = Paths.get("mauer-"+n+".tex");
+        try {
+            Files.write(path, text.getBytes());
+            Process process = new ProcessBuilder("pdflatex","-synctex=1","-interaction=nonstopmode", path.toAbsolutePath().toString()).redirectOutput(ProcessBuilder.Redirect.DISCARD).start();
+            process.waitFor();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println("Fertig!");
     }
 }
