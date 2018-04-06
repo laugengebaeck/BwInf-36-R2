@@ -113,7 +113,7 @@ Diese Vorgehensweise führt jedoch in einem Sonderfall nicht zum Erfolg. Wenn de
 \begin{figure}[H]
 \centering \includegraphics[width=0.3\textwidth]{pics/ill-cut.png}
 \end{figure}
-Dann nämlich wird der oben dargestellte Schritt beispielsweise zwischen dem mittleren und den niedrigsten Quadrat ausgeführt, jedoch erfolgt der gleiche Schritt auch zwischen dem mittleren und dem höchsten Quadrat, was den vorherigen Schritt wieder aufhebt und eine neue Passiermöglichkeit schafft. Im Beispiel verändert sich die Höhe des niedrigsten Quadrats von 1,0 auf 0,75 und die des mittleren Quadrats von 1,5 auf 1,75. Anschließend wird dann jedoch die Höhe des mittleren Quadrats auf 1,375 geändert (und $1,375 - 0,75 < 1$ !) und die des höchsten Quadrats auf 2,375. Um dies zu vermeiden, führt man den ersten Schritt normal aus, erreicht jedoch die benötigte Höhenänderung im zweiten Schritt dadurch, dass man Erde von einem anderem Nachbarquadrat des höchsten Quadrats verschiebt. Dieses Nachbarquadrat sollte sinnvollerweise nicht dem Endknoten einer Kante des Schnitts entsprechen. Im obigen Beispiel könnte dies der doppelt umrandete Knoten sein.
+Dann nämlich wird der oben dargestellte Schritt beispielsweise zwischen dem mittleren und den niedrigsten Quadrat ausgeführt, jedoch erfolgt der gleiche Schritt auch zwischen dem mittleren und dem höchsten Quadrat, was den vorherigen Schritt wieder aufhebt und eine neue Passiermöglichkeit schafft. Im Beispiel verändert sich die Höhe des niedrigsten Quadrats von 1,0 auf 0,75 und die des mittleren Quadrats von 1,5 auf 1,75. Anschließend wird dann jedoch die Höhe des mittleren Quadrats auf 1,375 geändert (und $1,375 - 0,75 < 1,0 $ !) und die des höchsten Quadrats auf 2,375. Um dies zu vermeiden, führt man den ersten Schritt normal aus, erreicht jedoch die benötigte Höhenänderung im zweiten Schritt dadurch, dass man Erde von einem anderem Nachbarquadrat des höchsten Quadrats verschiebt. \footnote{Genaugenommen ist in einem solchen Fall der Algorithmus nicht 100-prozentig sicher optimal, da dies nicht in unserem Graph modelliert werden kann. Somit könnte es theoretisch noch eine optimalere Möglichkeit zum Verschieben der Erde geben. In diesem Fall ist der Algorithmus jedoch zumindest eine gute Heuristik.} Dieses Nachbarquadrat sollte sinnvollerweise nicht dem Endknoten einer Kante des Schnitts entsprechen. Im obigen Beispiel könnte dies der doppelt umrandete Knoten sein.
  \subsection{Laufzeitanalyse des Algorithmus}
 Es ist leicht zu erkennen, dass der Edmonds-Karp-Algorithmus den größten Anteil zur Laufzeit beiträgt. Alle anderen Operationen sind nicht der Rede wert. Zunächst ist leicht zu erkennen, dass die Anzahl der Knoten im Graphen $|V| = n^{2}$ ist (abhängig von der Seitenlänge der Matrix $n$), da die Matrix quadratisch ist und somit $n^{2}$ Planquadrate enthält. Zusätzlich kommen noch $s$ und $t$ dazu, welche jedoch im folgenden vernachlässigbar sind. \\ \\
 Weiterhin befinden sich höchstens $|E| = 2 \cdot n + 2 \cdot n \cdot (n-1) = 2 \cdot n + 2 \cdot n^{2} - 2 \cdot n = 2 \cdot n^{2} $ Kanten im Graphen. Im Einzelnen sind dies die jeweils $n$ Kanten, die $s$ als Ausgangspunkt bzw. die $t$ als Endpunkt haben. Weiterhin befinden sich in der Matrix maximal $n \cdot (n-1)$ Kanten von links nach rechts und ebensoviele von oben nach unten. Die doppelt vorhandenen Kanten (in beide Richtungen) werden im Algorithmus als eine Kante und demzufolge hier auch so gezählt. \\ \\
@@ -122,6 +122,7 @@ Die genannte Laufzeit von $\mathcal{O}(|V| \cdot |E|^{2})$ lässt sich folgender
 \begin{proof}[Nachweis]
 Zunächst kann man zeigen, dass die Anzahl der zu augmentierenden Pfade des Edmonds-Karp-Algorithmus höchstens $\frac{|V| \cdot |E|}{2}$ beträgt. Dabei gibt es beim Augmentieren eines Pfades mindestens immer eine Kante, die gänzlich aus dem Residualnetzwerk gelöscht wird, da entweder eine Vorwärtskante vorkommt, die vollkommen gefüllt wird oder auch eine Rückwärtskante, die im Gegenzug geleert wird. Solch eine Kante bezeichne man als kritische Kante. Jedes Mal, wenn solch eine Kante eine kritische Kante ist, muss sich die Länge des durch diese Kante augmentierenden Pfades um 2 erhöhen. Da solch ein augmentierender Pfad höchstens die Länge n hat, können auf jeder Kante maximal $\frac{|V|}{2}$ augmentierende Pfade liegen, sodass die Gesamtzahl der augmentierenden Pfade höchstens $\frac{|V| \cdot |E|}{2}$ beträgt. Da die Breitensuche höchstens $|E|$ Kanten untersucht, folgt, dass der Algorithmus eine Laufzeit von $\mathcal{O}(|V| \cdot |E|^{2})$ hat.
 \end{proof}
+Zusätzlich soll hier auch die Speicherkomplexität betrachtet werden. Die Matrix selbst nimmt $\mathcal{O}(n^{2})$ Speicherplatz ein. Der Graph an sich nimmt bei Speicherung in einer Adjazenzliste $\mathcal{O}(|V| + |E|) = \mathcal{O}(n^{2})$ (Berechnung $|V|$ und $|E|$ siehe oben) Speicherplatz ein. Insgesamt ergibt sich, da Matrix und Graph die speicheraufwendigsten Datenstrukturen sind, eine quadratische Speicherkomplexität.
 \subsection{Erweiterung}
 Nehmen wir einmal an, die Wildschweine hätten eine Art von Intelligenz entwickelt und könnten einen Computer bedienen. Dieses Wissen wollen sie nun nutzen, um das Brachland zu passieren und dabei einen möglichst geringen Gesamthöhenunterschied zu überwinden. Weiterhin könnte für sie eventuell der größte Einzelhöhenunterschied auf diesem Weg von Interesse sein, denn dann könnten sie entsprechend dafür trainieren, das Brachland passieren zu können. Sie könnten dabei eventuell am Zustand vor den Erdarbeiten ebenso wie am Zustand nach den Erdarbeiten interessiert sein.\footnote{Ja, ich gebe zu, dieses Einsatzszenario ist etwas unrealistisch. ;-)}\\ \\
 Zur Lösung dieses Problems kann man die oben dargestellte Formulierung als Graph im Prinzip weiterverwenden. Es müssen dabei jedoch folgende Änderungen vorgenommen werden:
@@ -156,7 +157,7 @@ Eine weitere mögliche Erweiterung wäre es, die Zäune an der linken und rechte
 \end{thebibliography}
  \section{Umsetzung}
  \subsection{Allgemeines zur Bedienung des Programms}
- Das Programm wurde in Python 3.6.3 implementiert. Zur Verwaltung eines Graphen benutze ich die Python-Bibliothek \texttt{NetworkX}, welche über \texttt{pip3 install networkx} installiert werden kann. Grundlegend benutzt diese Adjazenzlisten, abstrahiert den Zugriff auf den Graphen jedoch ein wenig, sodass sich viele Operationen leichter durchführen lassen. Alle weiteren verwendeten Bibliotheken sind üblicherweise vorinstalliert. Die Eingabe des Programms erfolgt über eine Abfrage des Eingabedateinamens auf der Konsole, die Ausgabe erfolgt dann automatisch in eine entsprechende Datei mit dem vorgegebenen Dateinamen. Als kleiner Zusatz ist es möglich, die unüberwindbare Steigung zu verändern (entsprechend \autoref{sec:umform}), was zu Beginn abgefragt wird.
+ Das Programm wurde in Python 3.6.3 implementiert. Zur Verwaltung des abstrakten Datentyps Graph benutze ich die Python-Bibliothek \texttt{NetworkX}, welche über \texttt{pip3 install networkx} installiert werden kann. Grundlegend benutzt diese Adjazenzlisten, abstrahiert den Zugriff auf den Graphen jedoch ein wenig, sodass sich viele Operationen leichter durchführen lassen. Alle weiteren verwendeten Bibliotheken sind üblicherweise vorinstalliert. Die Eingabe des Programms erfolgt über eine Abfrage des Eingabedateinamens auf der Konsole, die Ausgabe erfolgt dann automatisch in eine entsprechende Datei mit dem vorgegebenen Dateinamen. Als kleiner Zusatz ist es möglich, die unüberwindbare Steigung zu verändern (entsprechend \autoref{sec:umform}), was zu Beginn abgefragt wird.
  \subsection{Umsetzung des Edmonds-Karp-Algorithmus}
  Im Modul \texttt{boarflow.py} sind folgende relevanten Funktionen zur Berechnung des minimalen Schnitts enthalten.
  \begin{longtabu} to \linewidth {lX}
@@ -178,7 +179,6 @@ Nun hat man eine unpassierbare Lösungsmatrix, welche ausgegeben wird. Außerdem
 \subsection{Implementierung der Erweiterung}
 In der Datei zur Erweiterung \texttt{dijkstra.py} befindet sich die Funktion \texttt{shortest\_path()}. Diese erhält als Eingabe eine beliebige Matrix mit den Höhen. Anschließend wird gemäß den bereits genannten Regeln der Graph aufgebaut. Der Dijkstra-Algorithmus wird dann ausgeführt und gibt den kürzesten Weg und dessen Länge zurück. Nun wird durch Iterieren über alle Kanten des Weges diejenige mit minimalem Gewicht (entsprechend der minimalen Steigung) bestimmt. Anschließend werden minimale Steigung, Gesamtsteigung und der Weg selbst ausgegeben. Die Funktion wird für jede Eingabedatei sowohl für die Eingabematrix als auch für die Ausgabematrix aufgerufen. \\ \\
 Der Dijkstra-Algorithmus selbst befindet sich in der Funktion \texttt{dijkstra\_st()}. Er arbeitet nach dem oben bereits beschriebenen Prinzip. Zur effizienten Implementierung wird hier eine Vorrangwarteschlange bzw. Priority Queue aus der Bibliothek \texttt{heapq} verwendet.
- \newpage
  \section{Beispiele}
  \RecustomVerbatimCommand{\VerbatimInput}{VerbatimInput}%
 {fontsize=\footnotesize,
@@ -298,15 +298,16 @@ Theoretisch ist es möglich, dass sich in den Ausgabedateien Werte durch Rundung
 \begin{figure}[H]
 \centering \includegraphics[width=0.5\textwidth]{pics/wildschwein5-lsg-top_to_bot_bool.png}
 \end{figure}
-\columnbreak
 ~\\
-Links oben: wildschwein1-lsg.txt \\
-Links unten: wildschwein2-lsg.txt \\
-Rechts oben: wildschwein3-lsg.txt \\
-Rechts unten: wildschwein4-lsg.txt \\
-auf dieser Seite: wildschwein5-lsg.txt \\
+\textit{Auf der vorigen Seite:} \\
+Links: wildschwein1-lsg.txt \\
+Rechts: wildschwein2-lsg.txt \\
+\textit{Auf dieser Seite:} \\
+Links oben: wildschwein3-lsg.txt \\
+Links unten: wildschwein4-lsg.txt \\
+Rechts oben: wildschwein5-lsg.txt \\
 \end{multicols}
-
+\newpage
 \subsection{Ergebnisse der Erweiterung}
 Der genaue Weg wurde ausgelassen, da er hier uninteressant ist.
 \begin{table}[H]
@@ -334,7 +335,7 @@ test2\_100-lsg.txt & 2,0 & 1,0 \\ \hline
  
  \begin{longlisting}
  \pythonfile[firstline=27,lastline=185]{../Bwinf-Aufgabe2-Wildschweine/wildschweine.py}
- \caption{Auszug aus dem Hauptprogramm (\textit{wildschweine.py})}
+ \caption{Auszug aus dem Hauptprogramm (\textit{wildschweine.py}), soweit möglich ohne Eingabe und Ausgabe}
  \end{longlisting}
  
  \begin{longlisting}

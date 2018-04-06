@@ -145,13 +145,14 @@ Nun kann man zwei Pruning-Kriterien festlegen.
 \item \textit{Das erweiterte Kriterium, Teil 2:} Befindet man sich noch nicht in der letzten Reihe und bemerkt, dass nach der Position, an der die aktuelle Reihe bisher endet, ein ebensolcher Abstand besteht, der größer als der längste in dieser Reihe noch nicht verwendete Klotz ist, ist Pruning ebenfalls möglich. In dieser Reihe müsste dieser Abstand nämlich noch überwunden werden, was jedoch keinesfalls möglich ist, da keine genügend langen Klötze mehr vorhanden sind.
 \end{enumerate}
 \subsection{Laufzeitanalyse und NP-Vollständigkeit}
-Die Laufzeit einer Backtracking-Lösung entspricht im schlimmsten Fall der Laufzeit einer Brute-Force-Lösung für das entsprechende Problem. Theoretisch ist die Laufzeitkomplexität hier also nur durch $\mathcal{O}(n!^{\floor{\frac{n + 2}{2}}})$ begrenzt. In der Realität wird die Laufzeit jedoch durch das Pruning in vertretbarem Rahmen gehalten. Mindestens bis $n = 14$ ist beispielsweise in der unten vorgestellten Implementierung eine Berechnung innerhalb einer Minute möglich, danach steigen die Laufzeiten bis ins Unendliche. Ein Überblick sowohl über die Laufzeit als auch über die Anzahl der benötigten Rekursionsaufrufe für verschiedene $n$ findet sich unter den Beispielen. \\ \\
+Die Laufzeit einer Backtracking-Lösung entspricht im schlimmsten Fall der Laufzeit einer Brute-Force-Lösung für das entsprechende Problem. Theoretisch ist die Laufzeitkomplexität hier also nur durch $\mathcal{O}(n!^{\floor{\frac{n + 2}{2}}})$ begrenzt. In der Realität wird die Laufzeit jedoch durch das Pruning in vertretbarem Rahmen gehalten. Mindestens bis $n = 14$ ist beispielsweise in der unten vorgestellten Implementierung eine Berechnung innerhalb einer Minute möglich, danach steigen die Laufzeiten so stark, dass Ilona vermutlich während ihrer gesamten restlichen Lebenszeit keine maximale Mauer erhalten kann\footnote{beziehungsweise, dass ich diese Mauern nicht bis zum Einsendeschluss berechnen kann.}. Ein Überblick sowohl über die Laufzeit als auch über die Anzahl der benötigten Rekursionsaufrufe für verschiedene $n$ findet sich unter den Beispielen. \\ \\
 Eine Frage, die sich hierbei auch stellt, ist diejenige, ob es für dieses Problem\footnote{nach aktuellem Kenntnisstand ($P = NP ?$)} einen in Polynomialzeit terminierenden Algorithmus geben kann. Dies entspricht der Frage, ob das Problem in der Klasse $NPC$\footnote{Genaugenommen ist diese Klasse nur für Entscheidungsprobleme definiert, daher handelt es sich bei diesem Suchproblem um NP-Äquivalenz.} (NP-vollständig bzw. NP-complete) liegt. Ich vermute, dass dies der Fall ist, kann es jedoch nicht beweisen. \\ \\
 Zum Beweis, dass ein Problem in $NPC$ liegt, werden zwei Voraussetzungen benötigt:
 \begin{enumerate}
 \item Eine deterministisch arbeitende Turingmaschine benötigt nur Polynomialzeit, um zu entscheiden, ob eine z.B. von einer Orakel-Turingmaschine vorgeschlagene Lösung tatsächlich eine Lösung des Problems ist. Dies ist hier der Fall, denn wenn eine Lösung vorgeschlagen wird, sind durch die Angabe aller Klötze auch alle Fugenpositionen bestimmt. Findet man eine Fugenposition mehr als einmal, so ist dies keine Lösung. Sonst handelt es sich um eine Lösung. Diese Überprüfung kann in $\mathcal{O}(n \cdot \floor{\frac{n + 2}{2}}) \approx \mathcal{O}(n^2)$, also in Polynomialzeit, vorgenommen werden.
 \item Das Problem ist NP-schwer. Das bedeutet, dass alle anderen NP-schweren Probleme auf dieses Problem in Polynomialzeit zurückgeführt werden können. Es ist also eine Polynomialzeitreduktion notwendig. Dabei ist ein Problem aus NPC als Ausgangsproblem nötig, wie z.B. Satisfiability. Eine solche Reduktion zu vollziehen, ist mir jedoch nicht möglich.
 \end{enumerate}
+Zuletzt soll hier auch die Speicherkomplexität betrachtet werden. Unter den verwendeten Datenstrukturen (siehe Abschnitt 2.2) ist die Mauer selbst am größten und deshalb für die Speicherkomplexität relevant. Das zweidimensionale Array hat dabei eine Größe von $\mathcal{O}(n \cdot \floor{\frac{n + 2}{2}}) \approx \mathcal{O}(n^2)$, was eine quadratische Speicherkomplexität bedeutet. Selbst, wenn man den Rekursions-Stack ebenfalls zum Speicher gezählt wird. Es gibt allerdings zu keinem Zeitpunkt mehr als $n \cdot \floor{\frac{n + 2}{2}}$ Rekursionsaufrufe, weshalb sich dies nicht weiter auf die Speicherkomplexität auswirkt.
 \subsection{Weitere Möglichkeiten zur Verbesserung der Laufzeit}
 Dieser Abschnitt soll weitere denkbare Lösungsansätze nennen und zeigen, warum diese für das Mauerproblem ungeeignet sind und von mir deshalb nicht gewählt wurden.
 \begin{itemize}
@@ -160,7 +161,6 @@ Dieser Abschnitt soll weitere denkbare Lösungsansätze nennen und zeigen, warum
 Aus welchen Gründen jedoch ist dieser Ansatz nicht geeignet? Zunächst kann man nicht verhindern, dass mögliche Lösungen doppelt betrachtet werden, wenn man keinen enormen Speicherverbrauch in Kauf nehmen möchte. Außerdem kann man sich nicht sicher sein, dass die bisher beste Lösung (nach $i$ Iterationen des Simulated Annealing) tatsächlich eine gültige Lösung (mit 0 doppelten Fugen) ist. Zuletzt betrachtet man schlimmstenfalls genau so viele Lösungsmöglichkeiten (oder gar mehr) wie bei Brute Force.\footnote{Heuristiken sind also in diesem Sinne nicht möglich. Vorannahmen, wie sie oben beschrieben wurden, sind jedoch ebenfalls eine Art Heuristik. Diese können natürlich verwendet werden.}
 \item \textit{Weitere Pruning-Kriterien:} Grundsätzlich könnten weitere Pruning-Kriterien die Laufzeit im besten Fall dramatisch verbessern. Alle weiteren Pruning-Kriterien, die ich gefunden habe, brachten jedoch keine Verbesserung oder sogar eine Verschlechterung. Als Beispiel sei hier ein Kriterium genannt. Es ist offensichtlich, dass sich in einer richtigen Lösung alle Reihen untereinander vertauschen lassen und die Lösung trotzdem richtig bleibt. \\ \\ Umgekehrt gilt auch: Wenn eine Reihe\footnote{Im Sinne einer Folge von Klötzen, welche entsprechend unabhängig von der genauen Positionierung in der Mauer ist.} oder ein Teil einer Reihe beim Backtracking nicht zu einer Lösung führen, dann können diese an anderen Stellen in der Mauer ebenfalls nicht zu einer Lösung führen. Dies gilt zumindest solange, bis eine der Fugen, die die weitere Fortsetzung der Reihe blockiert haben (da sie belegt waren), wieder freigegeben wird. Diese nicht zu einer Lösung führenden (Teil-)Reihen könnte man als Pruning-Kriterium festlegen. Implementiert man dieses Kriterium jedoch, so verschlechtert es sowohl Laufzeit als auch Speicherverbrauch.
 \end{itemize}
-\newpage
 Möglicherweise reicht es Ilona jedoch, wenn ihre Mauer für größere $n$ nicht maximal hoch ist, sie dafür aber wenigstens eine weniger hohe Mauer geliefert bekommt. Dazu kann man das Backtracking ganz einfach vorzeitig, also bei Erreichen einer geringeren Höhe, abbrechen. \\ \\ In der nachfolgenden Implementierung ist dies so geregelt, dass eine wählbare Anzahl von Reihen (diese muss bei jedem $n$ experimentell bestimmt werden) von der Maximalhöhe abgezogen wird. Sobald diese reduzierte Höhe erreicht ist, wird die Lösung ausgegeben. Insofern versuche ich mit diesem Schritt, eine möglichst hohe Mauer zu approximieren und gleichzeitig die Laufzeit erträglich zu halten.
 \begin{thebibliography}{xx}
 \bibitem[1] {Src:qwert} Wikipedia-Artikel zur NP-Vollständigkeit, \url{https://de.wikipedia.org/wiki/NP-Vollst\%C3\%A4ndigkeit}
@@ -191,12 +191,11 @@ Die Array-Position $0$ hat dabei jeweils keine Bedeutung und bleibt ungenutzt. I
 			(2, -1) rectangle ++(3, -1)
 			(5, -1) rectangle ++(1, -1);
 
-		\node[above] at (-.75, .25) {$i$};
 		\foreach \i in {1,...,5} {
 			\draw[dashed] (\i, .25) node[above] {\i} -- (\i, -2.25);
 		}
 	\end{tikzpicture}
-	\caption{Spalten einer Mauer}
+	\caption{Fugenpositionen einer Mauer}
 \end{figure}
 \texttt{backTrack()} ist die für das Backtracking verantwortliche Funktion. Die Parameter der Funktion sind größtenteils selbsterklärend. Zu diesen wäre nur noch zu sagen, dass \texttt{height} die Höhe der gewünschten Mauer angibt und \texttt{reihe} bzw. \texttt{klotzInReihe} das aktuell zu belegende Element der Lösung, wobei hier natürlich von 0 aus gezählt wird.
 \\ \\
@@ -224,6 +223,10 @@ Zuletzt ist \texttt{checkPruning()} dafür verantwortlich, die erweiterten Pruni
  | 1 | 2 | 3 | 
  | 2 | 3 | 1 |
  
+ 
+ 
+ 
+ 
  Lösung für n = 4: 
  | 1 | 2 | 3 | 4 | 
  | 2 | 3 | 4 | 1 | 
@@ -245,11 +248,9 @@ Zuletzt ist \texttt{checkPruning()} dafür verantwortlich, die erweiterten Pruni
  | 2 | 3 | 4 | 5 | 6 | 7 | 1 | 
  | 7 | 6 | 5 | 4 | 2 | 1 | 3 | 
  | 4 | 7 | 5 | 1 | 6 | 3 | 2 | 
- \end{verbatim}
- \end{multicols}
- \newpage
- \begin{center}
- \begin{Verbatim}
+
+
+
  Lösung für n = 8:
  | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 
  | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 1 | 
@@ -263,7 +264,10 @@ Zuletzt ist \texttt{checkPruning()} dafür verantwortlich, die erweiterten Pruni
  | 8 | 9 | 7 | 6 | 4 | 5 | 3 | 1 | 2 | 
  | 7 | 9 | 6 | 3 | 8 | 5 | 2 | 1 | 4 | 
  | 4 | 9 | 6 | 7 | 3 | 2 | 1 | 5 | 8 | 
- 
+  \end{verbatim}
+ \end{multicols}
+ \begin{center}
+ \begin{Verbatim}
  Lösung für n = 10:
  | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 
  | 9 | 10 | 8 | 7 | 6 | 4 | 5 | 3 | 2 | 1 | 
@@ -364,9 +368,8 @@ Zuletzt ist \texttt{checkPruning()} dafür verantwortlich, die erweiterten Pruni
  | 16 | 18 | 17 | 19 | 15 | 14 | 12 | 20 | 11 | 9 | 10 | 7 | 8 | 3 | 6 | 1 | 5 | 2 | 4 | 13 | 
  | 13 | 20 | 19 | 17 | 15 | 14 | 12 | 18 | 11 | 7 | 8 | 6 | 2 | 4 | 9 | 3 | 5 | 1 | 10 | 16 |   
  \end{Verbatim}
- \end{center}
- Die Visualisierungen wurden nicht in dieses Dokument eingebunden, da sie teilweise zu breit für eine Seite wären. Sie sind jedoch der Implementierung im Unterordner \texttt{visualisierung} beigelegt (die LaTeX-Quelldateien befinden sich im Unterordner \texttt{visualisierung-quell}). \\ \\
- Bei denjenigen Werten für $n$, bei denen  aus Laufzeitgründen eine Höhenreduzierung notwendig war, ist in der folgenden Tabelle jeweils der erste Höhenreduzierungswert angegeben, bei dem die Laufzeit unter 5 Minuten lag. \\ \\
+ \end{center} Die Visualisierungen sind zusätzlich der Implementierung im Unterordner \texttt{visualisierung} beigelegt (die LaTeX-Quelldateien befinden sich im Unterordner \texttt{visualisierung-quell}). \\ \\
+ Bei denjenigen Werten für $n$, bei denen  aus Laufzeitgründen eine Höhenreduzierung notwendig war, ist in der folgenden Tabelle jeweils der erste Höhenreduzierungswert angegeben, bei dem die Laufzeit unproblematisch war. 
 Für größere $n$ als 20 wurde das Programm nicht ausprobiert, da bei diesen die Laufzeiten noch problematischer werden als ohnehin schon.
  \begin{center}
  \begin{tabular}{|c|c|c|c|c|c|}
@@ -393,12 +396,54 @@ Für größere $n$ als 20 wurde das Programm nicht ausprobiert, da bei diesen di
 20 & 772 ms & 3237947 & 4 & 7& 11\\ \hline
  \end{tabular}
  \end{center}
+\subsection*{Visualisierungen}
+\begin{center}
+$n = 2$\\
+\includegraphics[scale=.5]{../Bwinf-Aufgabe1-KunstDerFuge/visualisierung/mauer-2.pdf}
+\par\vspace{1em}
+$n = 3$\\
+\includegraphics[scale=.5]{../Bwinf-Aufgabe1-KunstDerFuge/visualisierung/mauer-3.pdf}
+\par\vspace{1em}
+$n = 4$\\
+\includegraphics[scale=.5]{../Bwinf-Aufgabe1-KunstDerFuge/visualisierung/mauer-4.pdf}
+\par\vspace{1em}
+$n = 5$\\
+\includegraphics[scale=.5]{../Bwinf-Aufgabe1-KunstDerFuge/visualisierung/mauer-5.pdf}
+\par\vspace{1em}
+$n = 6$\\
+\includegraphics[scale=.5]{../Bwinf-Aufgabe1-KunstDerFuge/visualisierung/mauer-6.pdf}
+\par\vspace{1em}
+\newpage
+$n = 7$\\
+\includegraphics[width=\textwidth]{../Bwinf-Aufgabe1-KunstDerFuge/visualisierung/mauer-7.pdf}
+\par\vspace{1em}
+$n = 8$\\
+\includegraphics[width=\textwidth]{../Bwinf-Aufgabe1-KunstDerFuge/visualisierung/mauer-8.pdf}
+$n = 9$\\
+\includegraphics[width=\textwidth]{../Bwinf-Aufgabe1-KunstDerFuge/visualisierung/mauer-9.pdf}
+\par\vspace{1em}
+$n = 10$\\
+\includegraphics[width=\textwidth]{../Bwinf-Aufgabe1-KunstDerFuge/visualisierung/mauer-10.pdf}
+\par\vspace{1em}
+$n = 11$\\
+\includegraphics[width=\textwidth]{../Bwinf-Aufgabe1-KunstDerFuge/visualisierung/mauer-11.pdf}
+\par\vspace{1em}
+$n = 12$\\
+\includegraphics[width=\textwidth]{../Bwinf-Aufgabe1-KunstDerFuge/visualisierung/mauer-12.pdf}
+\par\vspace{1em}
+$n = 13$\\
+\includegraphics[width=\textwidth]{../Bwinf-Aufgabe1-KunstDerFuge/visualisierung/mauer-13.pdf}
+\par\vspace{1em}
+$n = 14$\\
+\includegraphics[width=\textwidth]{../Bwinf-Aufgabe1-KunstDerFuge/visualisierung/mauer-14.pdf}
+\end{center}
+
  \section{Quellcode}
  \renewcommand{\listingscaption}{Quellcode}
  
  \begin{longlisting}
- \javafile[lastline=158]{../Bwinf-Aufgabe1-KunstDerFuge/src/de/lukasrost/bwinf2017/r2_1/Main.java}
- \caption{Der Backtracking-Algorithmus (\texttt{Main.java}) ohne Code für die Visualisierung}
+ \javafile{../Bwinf-Aufgabe1-KunstDerFuge/src/de/lukasrost/bwinf2017/r2_1/Main.java}
+ \caption{\texttt{Main.java}}
  \end{longlisting}
  
  \end{document}
